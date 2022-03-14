@@ -13,7 +13,7 @@ import seaborn as sns
 # Funzione di sampling
 #-------------------------------------------------
 
-def Sampling(dati, quantile = 0.15, par_buffer = 0.5, par_length = 2,
+def Sampling(dati, detail = 10, par_buffer = 0.5, par_length = 2,
         finelength = True, minPoints = 4, analysis = False):
 
     """Sampling: funzione definitiva.
@@ -40,9 +40,6 @@ def Sampling(dati, quantile = 0.15, par_buffer = 0.5, par_length = 2,
     # Pochi punti: ignoro lo step
     if len(dati_media) < minPoints:
         dati_media = orig_dati
-
-    # Calcolo la soglia variabile
-    detail = r_detailq(dati, quantile)
 
     # Step 3: metodo del buffer (soglia fissa)
     # La tolleranza dipende dal dettaglio

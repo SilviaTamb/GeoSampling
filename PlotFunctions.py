@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 from shapely.geometry import Point
 import math
+from numpy.linalg import norm
+import seaborn as sns
 
 #---------------------------------------
 # Funzione per plottare i poligoni dati
@@ -83,3 +85,28 @@ def plot_zoom(dati, d_meter = 10, s=1):
         x,y = elem.exterior.xy
         plt.plot(x,y)
     plt.show()
+
+
+#------------------------------------------
+# Plot istogramma lunghezze segmenti
+#-------------------------------------------
+
+def plot_length(dati):
+
+    """Plot dell'istogramma con le lunghezze dei segmenti che compongono il poligono
+    
+    Questo plot produce l'istogramma con le lunghezze dei segmenti che compongono il poligono. 
+    L'istogramma viene prodotto grazie a Seaborn.
+    """
+
+    distances = []
+
+    for i in range(0, len(dati)-2):
+        A = dati.iloc[i].to_numpy()
+        B = dati.iloc[i+1].to_numpy()
+        distance = norm(A-B)
+        radius = 6371000
+        distance_meter = 2*math.pi*radius*distance/360 #Distanze in metri
+        distances.append(distance_meter)
+
+    sns.displot(distances)
