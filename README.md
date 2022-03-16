@@ -11,4 +11,4 @@ This package assumes data in this form:
 - Two columns: a 'Latitude' column with a floating point inside, a 'Longitude' column with a floating point inside.
 - North Latitude is positive, East Longitude is positive.
 
-This package has been tested on confidential data. Data will not be shared.
+This package has been tested on confidential data; therefore, data and Jupyter Notebooks that contain trials and errors will not be shared.
