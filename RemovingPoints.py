@@ -31,6 +31,7 @@ def rem_median(dati, acc = 4):
         
         values = dati[i:i+3]
 
+        # Condizione di uscita dovuta alla rimozione dei punti in-place
         if len(values) < 3:
             return dati
         
@@ -69,7 +70,7 @@ def rem_buffer(dati, tol_meter = 10):
     NOTA: condizioni al contorno periodiche necessarie, da porre FUORI dal dataset.
     """
 
-    # Da metri a gradi
+    # Conversione da metri a gradi della tolleranza
     radius = 6371000
     tol = 360*tol_meter/(2*math.pi*radius)
 
@@ -80,6 +81,7 @@ def rem_buffer(dati, tol_meter = 10):
         
         values = dati[i:i+3]
 
+        # Condizione di uscita dovuta alla rimozione dei punti in-place
         if len(values) < 3:
             return(dati)
         

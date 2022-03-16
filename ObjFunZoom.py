@@ -6,7 +6,8 @@ import pandas as pd
 import itertools
 from shapely.geometry import Point
 import math
-#import matplotlib.pyplot as plt
+import copy
+from collections import OrderedDict
 
 #-------------------------------------------------
 # Dataframe df_points con buffer per ogni punto
@@ -17,10 +18,11 @@ def points_with_buffer(dati, d = 2*1e-4):
 
     """Dataframe con punti 'zoomati'.
 
-    A partire da un dataframe di Pandas "resettato" (condizioni al contorno rimosse) in cui una colonna si chiama
-    'Latitude' e una 'Longitude', genera i punti 'zoomati' (i poligoni) per ogni punto, e produce due output:
-    una lista con tutti i poligoni, etichettati da un numero progressivo, e un dataframe con tutti i punti, 
-    anch'essi etichettati dallo stesso numero progressivo, con associate le coordinate dei poligoni. 
+    A partire da un dataframe di Pandas "resettato" (condizioni al contorno rimosse) in cui una colonna 
+    si chiama 'Latitude' e una 'Longitude', genera i punti 'zoomati' (i poligoni) per ogni punto, e produce 
+    due output: una lista con tutti i poligoni, etichettati da un numero progressivo, 
+    e un dataframe con tutti i punti,  anch'essi etichettati dallo stesso numero progressivo, 
+    con associate le coordinate dei poligoni. 
     NOTA: qui il parametro d (diametro del punto) è considerato in GRADI.   
     """
     
@@ -132,12 +134,13 @@ def dataset_groups(lista):
 
 def find_clusters(groups):
 
-    """Elenco di clusters, a partire dal dataset groups.
+    """Elenco di clusters, a partire dal dataset groups (prima parte)
 
-    A partire da un dataset di punti "ordinati" che per ogni punto mi elenca le intersezioni con i punti successivi,
-    determino i cluster di punti che si intersecano, in modo tale che i punti A e B fanno parte dello stesso cluster
-    se A si interseca con B, oppure se A si interseca con C che si interseca con B, oppure se A si interseca con C
-    che si interseca con D che si interseca con B, e via così (con tutti i livelli possibili).
+    A partire da un dataset di punti "ordinati" che per ogni punto mi elenca le intersezioni con i punti
+    successivi, determino i cluster di punti che si intersecano, in modo tale che i punti A e B fanno parte 
+    dello stesso cluster se A si interseca con B, oppure se A si interseca con C che si interseca con B, 
+    oppure se A si interseca con C che si interseca con D che si interseca con B, e via così 
+    (con tutti i livelli possibili).
     """
     
     clusters = [] # Conterrà i clusters
@@ -177,9 +180,48 @@ def find_clusters(groups):
             my_set = my_set.union({point})
             clusters.append(my_set)
 
-        index_p = max(my_set) + 1
+        index_p = index_p + 1
         
     return clusters
+
+
+def find_real_clusters(lista_clusters):
+
+    """Elenco di clusters (seconda parte, correzione della funzione precedente)
+    
+    La funzione find_clusters restituisce una lista di insiemi, e ogni insieme è presente nella lista
+    con anche alcuni suoi sottoinsiemi. Quindi, se per esempio è presente l'insieme A = {1, 2, 4}, ci sarà
+    anche l'insieme B = {2, 4} e l'insieme B = {4}. Di conseguenza, voglio eliminare gli eventuali 
+    sovrainsiemi che trovo con questa funzione che li elimina tutti.
+    """
+
+    # Nuova lista di clusters
+    new_lista_clusters = []
+
+    for elem in lista_clusters:
+    
+        lista = copy.deepcopy(lista_clusters)
+        lista.remove(elem) #Ottengo una copia della lista di partenza ma senza questo elemento
+
+        # Voglio controllare per tutti gli elementi della lista
+        # se non ci sono 'sovrainsiemi': cioè, l'elemento che prendo è il cluster
+        # a meno che non sia il sottoinsieme di un insieme esistente
+        # allora in questo caso diventa lui l'insieme.
+
+        new_cluster = elem
+
+        for insieme in lista:
+            if elem.issubset(insieme) and len(insieme) > len(new_cluster):
+                new_cluster = insieme
+
+        new_lista_clusters.append(new_cluster)
+
+    # A questo punto, ogni cluster è stato sostituito con il suo sovrainsieme
+    # Utilizzo questa espressione per rimuovere i duplicati e ottenere una lista di clusters pulita
+    new_lista_clusters = [set(i) for i in OrderedDict.fromkeys(frozenset(item) for item in new_lista_clusters)]
+
+    return new_lista_clusters
+
 
 #--------------------------------------------------
 # Add labels
@@ -202,38 +244,9 @@ def add_labels(df_points, clusters):
     return points_with_labels
 
 
-#------------------------------------------------------
-# Final objective function
-#------------------------------------------------------
+def add_centroids(points_with_labels):
 
-def ObjFunZoom(dati, d_meter = 10, return_originals = False):
-
-    """Objective function finale.
-
-    Dati i dati di origine e il livello di dettaglio, che corrisponde al diametro di ciascun punto (dato in metri), 
-    ogni punto dei dati di origine viene 'zoomato' al livello di dettaglio indicato
-    (che fa da diametro), e poi se più punti si intersecano tra loro, sono considerati come 'da raggruppare' in un
-    unico punto. Questa funzione genera i 'nuovi punti' che derivano da questa operazione (che sono i punti più
-    vicini ai centroidi dei cluster risultanti). il loro numero mi indica quanti punti 'dovrebbero esserci' 
-    se avessi ingrandito a quel livello di dettaglio. 
-    NOTA: qui il parametro d (diametro del punto) è considerato in METRI.
-    """
-
-    # Conversione da metri a gradi
-    radius = 6371000
-    d = 360*d_meter/(2*math.pi*radius)
-
-    # Genero i punti con i buffer
-    df_points, lista = points_with_buffer(dati, d)
-
-    # Genero le intersezioni di ciascun punto con i successivi
-    groups = dataset_groups(lista)
-
-    # Cluster dalle intersezioni
-    clusters = find_clusters(groups)
-
-    # Etichette ai punti
-    points_with_labels = add_labels(df_points, clusters)
+    """Dati i punti con la loro label, restituisci il centroide"""
 
     # Centroidi dei cluster e merge con i punti originali
     new_points = points_with_labels.groupby('Label').mean().reset_index()[['Label', 'Latitude', 'Longitude']]
@@ -254,42 +267,49 @@ def ObjFunZoom(dati, d_meter = 10, return_originals = False):
     # Selezione dei punti più vicini al cluster
     new_points = points_with_labels[points_with_labels['Flag_nearest'] == True].reset_index(drop = True)
 
-    if return_originals:
-        return points_with_labels
-
-    else: 
-        return new_points[['Latitude', 'Longitude', 'Point_Name']]
+    return new_points[['Latitude', 'Longitude', 'Point_Name']]
 
 
 
-#-------------------------------------
-# Plot del buffer per ciascun punto
-#-------------------------------------
+#------------------------------------------------------
+# Final objective function
+#------------------------------------------------------
 
-# def plot_zoom(dati, d_meter = 10, s=1):
+def ObjFunZoom(dati, d_meter = 10):
 
-#     """Plot dei punti 'zoomati': prequel della funzione.
-    
-#     A partire da un dataframe "preparato" (condizioni al contorno resettate) in cui una colonna si chiama 'Latitude'
-#     e una colonna si chiama 'Longitude', genera e plotta i punti "zoomati", così che ogni punto abbia in realtà un
-#     diametro pari a d (in metri). Questa funzione è una sorta di 'prequel' allo zoom vero e proprio, 
-#     e mi fa vedere quanto considererei grandi i punti, e quindi quali si intersecheranno e diventeranno un singolo punto.
-#     Parametri di input: dati, diametro del punto (in metri), 
-#     s (parametro che ingrandisce la tela in cui il grafico viene stampato)
-#     """
+    """Objective function finale.
 
-#     radius = 6371000
-#     d = 360*d_meter/(2*math.pi*radius)
-    
-#     points = []
-    
-#     for index, row in dati.iterrows():
-#         point = Point(row['Latitude'], row['Longitude'])
-#         point = point.buffer(d/2)
-#         points.append(point)
+    Dati i dati di origine e il livello di dettaglio, che corrisponde al diametro di ciascun punto 
+    (dato in metri), ogni punto dei dati di origine viene 'zoomato' al livello di dettaglio indicato
+    (che fa da diametro), e poi se più punti si intersecano tra loro, sono considerati come 'da raggruppare' in un
+    unico punto. Questa funzione genera i 'nuovi punti' che derivano da questa operazione (che sono i punti più
+    vicini ai centroidi dei cluster risultanti). il loro numero mi indica quanti punti 'dovrebbero esserci' 
+    se avessi ingrandito a quel livello di dettaglio. 
+    NOTA: qui il parametro d (diametro del punto) è considerato in METRI.
+    """
 
-#     fig, axes = plt.subplots(figsize = (6*s, 4*s))
-#     for elem in points:
-#         x,y = elem.exterior.xy
-#         plt.plot(x,y)
-#     plt.show()
+    # Conversione da metri a gradi
+    radius = 6371000
+    d = 360*d_meter/(2*math.pi*radius)
+
+    # Genero i punti con i buffer
+    df_points, lista = points_with_buffer(dati, d)
+
+    # Genero le intersezioni di ciascun punto con i successivi
+    groups = dataset_groups(lista)
+
+    # Cluster dalle intersezioni
+    clusters_p = find_clusters(groups)
+    clusters = find_real_clusters(clusters_p)
+
+    # Etichette ai punti
+    points_with_labels = add_labels(df_points, clusters)
+
+    # Aggiungi i centroidi
+    new_points = add_centroids(points_with_labels)
+
+    # Trasformo i nomi dei punti in indici
+    new_points = new_points.sort_values('Point_Name')
+    new_points = new_points.set_index('Point_Name')
+
+    return new_points

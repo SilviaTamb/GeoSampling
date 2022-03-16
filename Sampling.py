@@ -1,9 +1,13 @@
-from GeoSampling import PeriodicConditions as pc
-from GeoSampling import Periodics as pcs
-from GeoSampling import RemovingPoints as rp
+# Removing points
 from GeoSampling import ObjFunZoom as z
+from GeoSampling import RemovingPoints as rp
 from GeoSampling import RemovingLength as rl
+
+# Help modules
+from GeoSampling import Periodics as pcs
 from GeoSampling import PlotFunctions as pl
+
+# New modules
 import math
 import numpy as np
 from numpy.linalg import norm
@@ -14,23 +18,41 @@ import seaborn as sns
 #-------------------------------------------------
 
 def Sampling(dati, detail = 10, par_buffer = 0.5, par_length = 2,
-        finelength = True, minPoints = 4, analysis = False):
+        finelength = True, minPoints = 4, analysis = False, 
+        ifzoom = False, par_zoomed = 0.5):
 
     """Sampling: funzione definitiva.
+
     Metto assieme: rimozione media, rimozione buffer, rimozione segmenti corti.
-    Opzione finelength.
+    Objective function zoom facoltativa: opzione ifzoom.
+    Rimozione segmenti corti: scegliere se usare finelength o no.
     Condizioni di uscita se ci sono pochi punti.
     Condizioni al contorno: periodics.
-    Dettaglio dentro alla funzione di sampling, dettaglio dipendente dal quantile.
+    Dettaglio da calcolare fuori dalla funzione di sampling.
     Rendo dei parametri della funzione i fattori moltiplicativi del dettaglio.
     """
 
     # Reset dei dati (per le successive funzioni)
     orig_dati = pcs.reset_data(dati)
+    
+    # FACOLTATIVO: Metodo della funzione di zoom (metodo lungo)
+    if ifzoom:
+
+        zoomed = z.ObjFunZoom(orig_dati, d_meter = par_zoomed*detail)
+
+        if analysis:
+            analysisFunction(zoomed, 'Metoto dello zoom')
+
+        # Pochi punti: ignoro lo step
+        if len(zoomed) < minPoints:
+            zoomed = orig_dati
+
+    else:
+        zoomed = orig_dati
 
     # Step 2: Metodo della media (soglia fissa)
     # Sì condizioni al contorno (metto prima, tolgo dopo)
-    dati_media = pcs.PC(orig_dati)
+    dati_media = pcs.PC(zoomed)
     dati_media = rp.rem_median(dati_media)
     dati_media = pcs.RC(dati_media)
 
@@ -45,7 +67,7 @@ def Sampling(dati, detail = 10, par_buffer = 0.5, par_length = 2,
     # La tolleranza dipende dal dettaglio
     # Sì condizioni al contorno (metto prima, tolgo dopo)
     dati_buffer = pcs.PC(dati_media)
-    dati_buffer = rp.buffer(dati_buffer, tol_meter = detail*par_buffer)
+    dati_buffer = rp.rem_buffer(dati_buffer, tol_meter = detail*par_buffer)
     dati_buffer = pcs.RC(dati_buffer)
 
     if analysis:

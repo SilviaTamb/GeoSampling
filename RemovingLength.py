@@ -22,8 +22,6 @@ def rem_length(dati, lenmin_meter = 100):
     NOTA: condizioni al contorno necessarie, da porre FUORI dalla funzione.
     """
 
-    # TODO: input check controls.
-
     # Da metri a gradi
     radius = 6371000
     lenmin = 360*lenmin_meter/(2*math.pi*radius)
@@ -34,6 +32,8 @@ def rem_length(dati, lenmin_meter = 100):
     while i < end:
         
         values = dati[i:i+2]
+
+        # Condizione di uscita dovuta alla rimozione dei punti in-place.
         if len(values) < 3:
             return dati
         
@@ -62,13 +62,14 @@ def rem_finelength(dati, lenmin_meter = 100):
 
     """Rimozione dei punti che formano segmenti troppo corti (tenendo conto del segmento successivo)
 
-    Questa funzione parte da rem_length e applica una piccola correzione. Consideriamo i punti A, B, C, D, E; e immaginiamo che
-    AB, BC e CD siano corti, e DE sia lungo: se si applica rem_length, devono essere eliminati i punti B, C, D, e ci sarà un unico
-    segmento che connette AE. Ma se quel pezzo formato da tanti piccoli segmentini era importante (perché definiva un "cambio di
-    forma"), la forma viene cambiata molto. Quindi ecco come fare.
-    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama 'Longitude', 
-    questa funzione considera tre punti successivi: A, B, C. Parto da A e misuro AB e BC. Se BC supera la lunghezza minima, salto
-    direttamente a considerare C; se invece BC non la supera, allora ho i due casi come sopra: se AB è troppo corto, elimino B
+    Questa funzione parte da rem_length e applica una piccola correzione. 
+    Consideriamo i punti A, B, C, D, E; e immaginiamo che AB, BC e CD siano corti, e DE sia lungo: 
+    se si applica rem_length, devono essere eliminati i punti B, C, D, e ci sarà un unico segmento che 
+    connette AE. Ma se quel pezzo formato da tanti piccoli segmentini era importante 
+    (perché definiva un "cambio di forma"), la forma viene cambiata molto. Quindi ecco come fare.
+    Questa funzione considera tre punti successivi: A, B, C. Parto da A e misuro AB e BC. 
+    Se BC supera la lunghezza minima, salto direttamente a considerare C; se invece BC non la supera, 
+    allora ho i due casi come sopra: se AB è troppo corto, elimino B
     e al nuovo passo parto da A; altrimenti, tengo B e al nuovo passo parto da B.
     Il primo argomento sono i dati nel formato sopra, il secondo argomento è la lunghezza minima del segmento.
     Valori consigliati per la lunghezza minima: 100m (valore predefinito).
@@ -88,6 +89,7 @@ def rem_finelength(dati, lenmin_meter = 100):
 
         values = dati[i:i+3]
 
+        # Condizione di uscita dovuta alla rimozione dei punti in-place.
         if len(values) < 3:
             return dati
         
@@ -114,8 +116,5 @@ def rem_finelength(dati, lenmin_meter = 100):
             
         if BC.length < lenmin and AB.length > lenmin:
             i = i + 1
-
-        if len(dati) < 3: #Minimum number for creating lines
-            break
             
     return dati
