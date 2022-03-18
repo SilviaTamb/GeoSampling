@@ -37,11 +37,11 @@ def points_with_buffer(dati, d = 2*1e-4):
     # Creo un dataframe con il buffer per ciascun punto
     df_points = pd.DataFrame(points, columns = ['Point_Name', 'Buffer_Point'])
 
-    # Dati originali con coordinate e nome
+    # Dati originali, con coordinate e nome del punto
     new_dati = dati.copy(deep = True)
-    new_dati.insert(0, 'Point_Name', range(0, 0 + len(new_dati)))
+    new_dati['Point_Name'] = new_dati.index
     
-    # Metto assieme i due dataframe
+    # Metto assieme i dati originali con i dati del buffer
     df_points = df_points.merge(new_dati, on = 'Point_Name')
     
     return df_points, points
@@ -115,8 +115,8 @@ def dataset_groups(lista):
     # Aggiungi gli elementi che non si intersecano con niente
     # Inserendo una riga che contiene l'elemento e un set vuoto
     
-    s1 = set(range(0, len(lista))) #Tutti gli elementi
-    s2 = set(groups['Name_A'].unique()) #Elementi in GROUPS
+    s1 = set([i[0] for i in lista]) #Tutti gli elementi
+    s2 = set(groups['Name_A'].unique()) #Elementi in groups
 
     for element in s1.difference(s2):
         row = pd.DataFrame([[element, set()]],

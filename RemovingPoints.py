@@ -1,11 +1,62 @@
 # **********************************************************************************************
 # Questo file contiene due funzioni che ho scritto per rimuovere i punti:
+# rem_overlap, che rimuove i punti se sono sovrapposti;
 # rem_median, che rimuove i punti se sono sulla media degli altri due;
 # rem_buffer, che rimuove i punti se sono nel buffer degli altri due.
 # ***********************************************************************************************
 
 from shapely.geometry import LineString, Point
 import math
+
+#----------------------------------------------------------------------
+# Funzione per rimuovere i punti sovrapposti
+#----------------------------------------------------------------------
+
+def rem_overlap(dati, identity = True, acc = 4):
+
+    """Rimuove un punto se è sovrapposto a un altro.
+    
+    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama 
+    'Longitude', questa funzione considera i punti a due a due (A, B) e rimuove B se ha le stesse coordinate di A,
+    dove per "stesse coordinate" si intende che sono le stesse identiche (identity = True), oppure che sono
+    le stesse a meno di acc cifre decimali (acc = 4, valore predefinito).
+    NOTA: condizioni al contorno necessarie, da porre FUORI dal dataset.
+    """
+
+    i = 0
+    end = len(dati)-1
+    
+    while i < end:
+        
+        values = dati[i:i+2]
+
+        # Condizione di uscita dovuta alla rimozione dei punti in-place
+        if len(values) < 2:
+            return dati
+        
+        # Posizione dei punti
+        
+        firstLat = values.iloc[0]['Latitude']
+        firstLong = values.iloc[0]['Longitude']
+        secondLat = values.iloc[1]['Latitude']
+        secondLong = values.iloc[1]['Longitude']
+        
+        # Rimozione dei punti
+        
+        if identity:
+            if firstLat == secondLat and firstLong == secondLong:
+                dati = dati.drop(values.iloc[1].name, axis = 0)
+                end = end - 1
+            else:
+                i = i + 1
+        else:
+            if round(firstLat, acc) == round(secondLat, acc) and round(firstLong, acc) == round(secondLong, acc):
+                dati = dati.drop(values.iloc[1].name, axis = 0)
+                end = end - 1
+            else:
+                i = i + 1
+
+    return dati
 
 #-----------------------------------------------------------------------
 # Funzione per rimuovere i punti se sono sulla media degli altri due
