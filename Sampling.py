@@ -1,5 +1,6 @@
 # Removing points
 from GeoSampling import ObjFunZoom as z
+from GeoSampling import DBSCANsampling as dbsamp
 from GeoSampling import RemovingPoints as rp
 from GeoSampling import RemovingLength as rl
 
@@ -18,9 +19,9 @@ import seaborn as sns
 #-------------------------------------------------
 
 def Sampling(dati, detail = 10, par_identity = False,
+        clustering = False, ifzoom = False, par_zoomed = 0.5,
         par_buffer = 0.5, par_length = 2,
-        finelength = True, minPoints = 4, analysis = False, 
-        ifzoom = False, par_zoomed = 0.5):
+        finelength = True, minPoints = 4, analysis = False):
 
     """Funzione di sampling di un poligono.
 
@@ -47,21 +48,36 @@ def Sampling(dati, detail = 10, par_identity = False,
         dati_overlap = orig_dati
     
     #----------------------------------------------------
-    # FACOLTATIVO: Metodo della funzione di zoom (lungo)
+    # FACOLTATIVO: Metodi basati sul clustering
     # No condizioni al contorno
     #----------------------------------------------------
 
-    if ifzoom:
+    if clustering:
+        
+        # Metodo del clustering basato sulla mia funzione personale
+        if ifzoom:
 
-        zoomed = z.ObjFunZoom(dati_overlap, d_meter = par_zoomed*detail)
+            zoomed = z.ObjFunZoom(dati_overlap, d_meter = par_zoomed*detail)
 
-        if analysis:
-            analysisFunction(zoomed, 'Metoto dello zoom')
+            if analysis:
+                analysisFunction(zoomed, 'Metodo dello zoom')
 
-        if len(zoomed) < minPoints:
-            zoomed = orig_dati
+            if len(zoomed) < minPoints:
+                zoomed = dati_overlap
+
+        # Metodo del clustering basato sul DBSCAN
+        else:
+
+            zoomed = dbsamp.DBSCANsampling(dati_overlap, eps_meter = par_zoomed * detail)
+
+            if analysis:
+                analysisFunction(zoomed, 'Metodo DBSCAN')
+
+            if len(zoomed) < minPoints:
+                zoomed = dati_overlap
 
     else:
+        
         zoomed = dati_overlap
 
     #------------------------------------------------------
