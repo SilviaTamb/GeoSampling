@@ -34,7 +34,7 @@ def rem_length(dati, lenmin_meter = 100):
         values = dati[i:i+2]
 
         # Condizione di uscita dovuta alla rimozione dei punti in-place.
-        if len(values) < 3:
+        if len(values) < 2:
             return dati
         
         # Definisco AB
