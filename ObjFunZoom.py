@@ -231,8 +231,8 @@ def add_labels(df_points, clusters):
 
     """Aggiungi le etichette ai punti
 
-    Dato il dataframe di punti (df_points) e la lista di cluster (clusters) ottenuta da find_clusters, la funzione
-    assegna a ogni punto il cluster a cui appartiene.
+    Dato il dataframe di punti (df_points) e la lista di cluster (clusters) ottenuta da find_clusters, 
+    la funzione assegna a ogni punto il cluster a cui appartiene.
     """
     
     # Dataframe 'LABELS': per ogni nome di punto, la sua label

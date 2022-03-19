@@ -13,9 +13,11 @@ import math
 
 def DBSCANmodel(dati, eps_meter = 10):
 
-    """Applicazione del metodo DBSCAN
+    """Applicazione del metodo di clustering DBSCAN
     
-    Applico il metodo DBSCAN per raggruppare i punti in cluster, per poi sost
+    Applicazione del metodo DBSCAN per raggruppare i punti del poligono in cluster.
+    L'idea è che eps sia paragonabile al dettaglio, mentre minPoints deve essere pari a 2, perché
+    già con 2 punti io voglio semplificare il poligono. 
     """
 
     # Conversione da metri a gradi del valore di eps
@@ -26,7 +28,7 @@ def DBSCANmodel(dati, eps_meter = 10):
     model = DBSCAN(eps, min_samples=2).fit(dati)
 
     # Aggiunta label
-    # Il DBSCAN mette -1 per tutti i punti separati dal clustering
+    # Il DBSCAN mette -1 per tutti i 'noise point' del clustering
     dati['Labels'] = model.labels_
 
     return dati
@@ -39,7 +41,10 @@ def DBSCANlabels(dati):
 
     """Correzione delle label del DBSCAN
     
-    A partire da un dataset che ha le label come vengono restituite dal DBSCAN su Scikit-Learn (quindi con -1 nei noise points), assegniamo le label come me le aspetto -- quindi, ogni noise point costituisce un cluster a se stante.
+    A partire da un dataset che ha le label come vengono restituite dal DBSCAN su Scikit-Learn (quindi con -1
+    nei noise points), assegno le label come me le aspetto -- quindi, ogni noise point costituisce un
+    cluster a se stante e ha la sua label, che è un numero progressivo da max(label)+1, cioè dal massimo delle
+    label già esistenti.
     """
 
     # Prendo i dati con label = -1
@@ -69,7 +74,8 @@ def DBSCANsampling(dati, eps_meter = 10):
 
     """Utilizzo del modello di DBSCAN come funzione di sampling
     
-    Applicazione del modello di clustering DBSCAN come funzione di sampling, come alternativa alla mia funzione di sampling.
+    Applicazione del modello di clustering DBSCAN come funzione di sampling, da considerare come alternativa
+    alla mia funzione di sampling.
     """
 
     # Applicazione del modello DBSCAN

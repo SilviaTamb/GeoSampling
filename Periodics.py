@@ -36,9 +36,6 @@ def PC(dati):
     in cui le righe 0...N-1 sono uguali al dataframe di partenza, e in più
     la riga -1 è uguale alla riga N-1 e la riga N è uguale alla riga 0.
     """
-
-    # Dataset originale:
-    #---------------------
     
     # Indice della prima riga: 0
     # Indice dell'ultima riga: len(dati)-1

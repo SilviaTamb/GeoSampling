@@ -14,9 +14,10 @@ def rem_length(dati, lenmin_meter = 100):
 
     """Rimozione dei punti che formano segmenti troppo corti. 
 
-    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama 'Longitude', 
-    questa funzione considera la lunghezza del segmento tra due punti (AB), e se è più lunga di una certa lunghezza soglia,
-    elimina B e considera AC (dove C è il punto sucessivo); altrimenti, considera B e ricomincia.
+    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama
+    'Longitude', questa funzione considera la lunghezza del segmento tra due punti (AB), e se è più lunga 
+    di una certa lunghezza soglia, elimina B e considera AC (dove C è il punto sucessivo); altrimenti, 
+    considera B e ricomincia.
     Il primo argomento sono i dati nel formato sopra, il secondo argomento è la lunghezza minima del segmento.
     Valori consigliati per la lunghezza minima: 100m (valore predefinito)
     NOTA: condizioni al contorno necessarie, da porre FUORI dalla funzione.

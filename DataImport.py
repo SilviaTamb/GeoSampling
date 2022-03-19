@@ -21,8 +21,6 @@ def db_preparation(figures):
     la Latitudine e la Longitudine in colonne distinte.
     """
 
-    #TODO: check campi
-
     # Eliminazione dei tag
     # La colonna 'GEOM_corr' contiene l'elenco di tutte le coordinate di un poligono
     figures['GEOM_corr'] = figures['GEOM'].str.replace('</?gml:(?:[a-zA-z=",\.\s])+>', '', regex = True)
@@ -56,7 +54,11 @@ def anonimization(figura):
 
     """Funzione di anonimizzazione dei punti
     
-    Funzione di anonimizzazione dei punti dati per poter riportare nella tesi alcune immagini relative ai poligoni senza rivelare le coordinate degli impianti effettivi.Questa funzione anonimizza tutto ponendo un punto qualunque a (0,0) e calcolando latitudine e longitudine relativa rispetto a quel punto; e poi aggiunge un rumore bianco gaussiano con media 0 e deviazione standard 1e-5 (per non spostare troppo i punti). 
+    Funzione di anonimizzazione dei punti dati per poter riportare nella tesi alcune immagini relative ai 
+    poligoni senza rivelare le coordinate degli impianti effettivi.Questa funzione anonimizza tutto ponendo 
+    un punto qualunque a (0,0) e calcolando latitudine e longitudine relativa rispetto a quel punto; e poi 
+    aggiunge un rumore bianco gaussiano con media 0 e deviazione standard 1e-5 (per non spostare troppo 
+    i punti). 
     """
 
     # Punto di riferimento

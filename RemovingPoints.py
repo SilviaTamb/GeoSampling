@@ -111,10 +111,12 @@ def rem_buffer(dati, tol_meter = 10):
 
     """Rimuove un punto se è sul buffer degli altri due.
     
-    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama 'Longitude', 
-    questa funzione considera i punti a tre a tre (A, B, C): se B si trova nel buffer degli altri due, lo si rimuove. 
-    "Trovarsi nel buffer" significa che traccio la linea tra A e C, e considero un buffer geometrico attorno a questa linea;
-    se B si trova all'interno di questo buffer, "si trova nel buffer" e quindi verrà eliminato.
+    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama
+    'Longitude', questa funzione considera i punti a tre a tre (A, B, C): se B si trova nel buffer degli
+    altri due, lo si rimuove. 
+    "Trovarsi nel buffer" significa che traccio la linea tra A e C, e considero un buffer geometrico attorno
+    a questa linea; se B si trova all'interno di questo buffer, "si trova nel buffer" e quindi verrà
+    eliminato.
     Il primo argomento sono i dati nel formato sopra, poi tol indica quanto deve essere grande il buffer,
     infine inplace indica se i punti vanno rimossi 'in place', oppure a parte in seguito.
     Valori consigliati per la tolleranza: 10m (valore predefinito). 

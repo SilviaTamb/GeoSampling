@@ -18,41 +18,43 @@ from GeoSampling import DBSCANsampling as DBsamp
 
 def plot_polygon(dati, titolo = 'Poligono', s = 1):
 
-    """Plot a polygon from coordinates.
+    """Plottare un poligono date le coordinate
 
-    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama 'Longitude', 
-    questa funzione plotta il poligono risultante su un grafico di Matplotlib, usando la funzione Polygon e disegnando anche
-    i singoli punti. Il primo argomento sono i dati nel formato sopra, il secondo argomento è il titolo del grafico, che
-    deve essere una stringa.
+    A partire da un dataframe di Pandas per cui c'è una colonna che si chiama 'Latitude' e una che si chiama
+    'Longitude', questa funzione plotta il poligono risultante su un grafico di Matplotlib, usando la
+    funzione Polygon e disegnando anche i singoli punti. Il primo argomento sono i dati nel formato sopra, 
+    il secondo argomento è il titolo del grafico, che deve essere una stringa, e il terzo argomento è un
+    fattore di scala a cui si vuole sia ingrandita la figura.
     """
     
     if (not isinstance(titolo, str)):
         raise Exception("L'argomento 'Titolo' deve essere una stringa")
     
-    # List of points from data structure
+    # Lista di punti dai dati
     points = list((zip(list(dati['Latitude']), list(dati['Longitude']))))
     
     fig, ax = plt.subplots(figsize = (6*s, 4*s))
 
-    # Plot polygon
+    # Plot del poligono
     poly = Polygon(points, ec="k")
     ax.add_patch(poly)
 
-    # Plot points
+    # Plot dei singoli punti del poligono (separatamente)
     ax.scatter(dati.Latitude, dati.Longitude, color="k", alpha=0.5, zorder=1)
 
-    # Plot original labels
+    # Plot degli indici originali
     indexes = list(dati.index) #Indici originali
     dati = dati.reset_index() #Per poter fare dati.Latitude[i] senza che dia errore
     
     for i, txt in enumerate(indexes):
         ax.annotate(txt, (dati.Latitude[i], dati.Longitude[i]))
 
-    # Visualization options
+    # Opzioni di visualizzazione
     ax.set_title(titolo)
     ax.margins(0.1)
     ax.relim()
     ax.autoscale_view()
+
 
 #-------------------------------------
 # Plot del buffer per ciascun punto
@@ -62,10 +64,10 @@ def plot_zoom(dati, d_meter = 10, s=1):
 
     """Plot dei punti 'zoomati': prequel della funzione.
     
-    A partire da un dataframe "preparato" (condizioni al contorno resettate) in cui una colonna si chiama 'Latitude'
-    e una colonna si chiama 'Longitude', genera e plotta i punti "zoomati", così che ogni punto abbia in realtà un
-    diametro pari a d (in metri). Questa funzione è una sorta di 'prequel' allo zoom vero e proprio, 
-    e mi fa vedere quanto considererei grandi i punti, e quindi quali si intersecheranno e diventeranno un singolo punto.
+    A partire da un dataframe "preparato" (condizioni al contorno resettate) in cui una colonna si chiama 'Latitude' e una colonna si chiama 'Longitude', genera e plotta i punti "zoomati", così che ogni punto
+    abbia in realtà un diametro pari a d (in metri). Questa funzione è una sorta di 'prequel' allo zoom 
+    vero e proprio, e mi fa vedere quanto considererei grandi i punti, e quindi quali si intersecheranno 
+    e diventeranno un singolo punto.
     Parametri di input: dati, diametro del punto (in metri), 
     s (parametro che ingrandisce la tela in cui il grafico viene stampato)
     """
@@ -75,15 +77,18 @@ def plot_zoom(dati, d_meter = 10, s=1):
     
     points = []
     
+    # Calcolo di tutti i buffer per ogni punto
     for index, row in dati.iterrows():
         point = Point(row['Latitude'], row['Longitude'])
         point = point.buffer(d/2)
         points.append(point)
 
+    # Rappresentazione dei buffer per ciascun punto
     fig, axes = plt.subplots(figsize = (6*s, 4*s))
     for elem in points:
         x,y = elem.exterior.xy
         plt.plot(x,y)
+
     plt.show()
 
 
@@ -101,6 +106,7 @@ def plot_length(dati):
 
     distances = []
 
+    # Calcolo delle distanze tra punti consecutivi
     for i in range(0, len(dati)-2):
         A = dati.iloc[i].to_numpy()
         B = dati.iloc[i+1].to_numpy()
@@ -109,6 +115,7 @@ def plot_length(dati):
         distance_meter = 2*math.pi*radius*distance/360 #Distanze in metri
         distances.append(distance_meter)
 
+    # Istogramma delle distanze (senza opzioni di bin)
     sns.displot(distances)
 
 
@@ -131,14 +138,14 @@ def plot_DBSCAN(orig_dati, eps_meter = 10, titolo = 'DBSCAN model', s=1):
     
     fig, ax = plt.subplots(figsize = (6*s, 4*s))
 
-    # Plot polygon
+    # Plot del poligono
     poly = Polygon(points, ec="k")
     ax.add_patch(poly)
 
-    # Plot points
+    # Plot dei singoli punti separatamente
     ax.scatter(dati.Latitude, dati.Longitude, s = 200, c=dati.Labels, alpha=0.5, zorder=1)
 
-    # Plot original labels
+    # Plot degli indici originali
     indexes = list(dati.index) #Indici originali
     dati = dati.reset_index() #Per poter fare dati.Latitude[i] senza che dia errore
     

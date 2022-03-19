@@ -42,7 +42,6 @@ def diffPoints(orig, sampled):
     # Reset dei punti originali
     orig = pc.reset_data(orig)
 
-
     # Punti mancanti
     allpoints = list(orig.index.values)
     remaining = list(sampled.index.values)
@@ -131,12 +130,11 @@ def diffArea(orig, sampled):
 
     """Differenza di area relativa tra orig e sampled.
 
-    Questa funzione calcola la differenza in area tra il poligono originale (orig) e il poligono ottenuto a seguito
-    del sampling (sampled), entrambi nel formato di dataframe di Pandas per cui una colonna si chiama 'Latitude' 
-    una colonna si chiama 'Longitude'.
-
-    NOTA: questa differenza è una differenza tra due aree in gradi al quadrato, ma non conta perché è una differenza
-    relativa.
+    Questa funzione calcola la differenza in area tra il poligono originale (orig) e il poligono ottenuto a
+    seguito del sampling (sampled), entrambi nel formato di dataframe di Pandas per cui una colonna si chiama
+    'Latitude' e una colonna si chiama 'Longitude'.
+    NOTA: questa differenza è una differenza tra due aree in gradi al quadrato, ma non conta perché è una
+    differenza relativa.
     """
 
     orig_area = abs(PolyArea(orig))
@@ -163,9 +161,6 @@ def maxDistance(orig, sampled):
     entrambi nel formato di Pandas con una colonna che si chiama 'Latitude' e una che si chiama 'Longitude', 
     calcolo lo scarto massimo tra i due, considerando anche in questo caso scarti sempre positivi.
     """
-
-    # TODO: input check controls
-    # In particolare la colonna "point name"
 
     # Dataframe dei poligoni dei punti consecutivi
     df = diffPoints(orig, sampled)
