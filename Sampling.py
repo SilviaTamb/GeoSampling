@@ -93,7 +93,7 @@ def Sampling(dati, detail = 10, par_identity = False,
         analysisFunction(dati_media, 'Metodo della media')
 
     if len(dati_media) < minPoints:
-        dati_media = orig_dati
+        dati_media = zoomed
 
     #----------------------------------------------------------
     # Metodo del buffer (soglia dipendente dal dettaglio)
