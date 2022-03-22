@@ -50,7 +50,7 @@ def db_preparation(figures):
 # Funzione di anonimizzazione dei dati
 #--------------------------------------
 
-def anonimization(figura):
+def anonimization(figura, addnoise = False):
 
     """Funzione di anonimizzazione dei punti
     
@@ -69,9 +69,10 @@ def anonimization(figura):
     figura['Latitude'] = figura['Latitude']-latref
     figura['Longitude'] = figura['Longitude']-lonref
 
-    # Rumore bianco
-    noise = np.random.normal(0,1e-5,len(figura))
-    figura['Latitude'] = figura['Latitude'] + noise
-    figura['Longitude'] = figura['Longitude'] + noise
+    if addnoise:
+        # Rumore bianco
+        noise = np.random.normal(0,1e-5,len(figura))
+        figura['Latitude'] = figura['Latitude'] + noise
+        figura['Longitude'] = figura['Longitude'] + noise
 
     return figura
