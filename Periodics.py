@@ -37,8 +37,12 @@ def PC(dati):
     la riga -1 è uguale alla riga N-1 e la riga N è uguale alla riga 0.
     """
     
-    # Indice della prima riga: 0
-    # Indice dell'ultima riga: len(dati)-1
+    # Indice (resettato) della prima riga: 0
+    # Indice (resettato) dell'ultima riga: len(dati)-1
+    # Uso .iloc per pescare il valore
+
+    # Indice non resettato dell'ultima riga:
+    index_ultima = max(dati.index) + 1
 
     # Riga -1: deve essere uguale alla riga N-1
     add_top = pd.DataFrame([[dati.iloc[len(dati)-1]['Latitude'],
@@ -50,7 +54,7 @@ def PC(dati):
     add_bottom = pd.DataFrame([[dati.iloc[0]['Latitude'],
                             dati.iloc[0]['Longitude']]],
                             columns = ["Latitude", "Longitude"],
-                            index = [len(dati)])
+                            index = [index_ultima])
 
     # Aggiunta delle righe al dataframe
     dati = pd.concat([add_top, dati, add_bottom])

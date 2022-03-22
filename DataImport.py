@@ -60,19 +60,21 @@ def anonimization(figura, addnoise = False):
     aggiunge un rumore bianco gaussiano con media 0 e deviazione standard 1e-5 (per non spostare troppo 
     i punti). 
     """
+    # Nuova figura da creare
+    new_figura = figura
 
     # Punto di riferimento
     latref = figura['Latitude'].iloc[0]
     lonref = figura['Longitude'].iloc[0]
 
     # Anonimizzazione relativa al primo punto
-    figura['Latitude'] = figura['Latitude']-latref
-    figura['Longitude'] = figura['Longitude']-lonref
+    new_figura['Latitude'] = new_figura['Latitude']-latref
+    new_figura['Longitude'] = new_figura['Longitude']-lonref
 
     if addnoise:
         # Rumore bianco
         noise = np.random.normal(0,1e-5,len(figura))
-        figura['Latitude'] = figura['Latitude'] + noise
-        figura['Longitude'] = figura['Longitude'] + noise
+        new_figura['Latitude'] = new_figura['Latitude'] + noise
+        new_figura['Longitude'] = new_figura['Longitude'] + noise
 
-    return figura
+    return new_figura
