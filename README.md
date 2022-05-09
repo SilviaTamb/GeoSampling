@@ -1,6 +1,6 @@
 # GeoSampling
 
-Python package for sampling geographical polygons, developed as Master thesis in Data Science at University of Milano-Bicocca. Comments and docstrings are in italian. Please let me know if you are interested in a translation, but note that this package does not contain input checks and therefore it is (as for now) built only for personal purposes. 
+Python package for sampling geographical polygons, developed as Master thesis in Data Science at University of Milano-Bicocca. The Master thesis serves also as documentation for this package. Comments and docstrings are in italian. Please let me know if you are interested in a translation, but note that this package does not contain input checks and therefore it is (as for now) built only for personal purposes. 
  
 This package assumes data in this form:
  
