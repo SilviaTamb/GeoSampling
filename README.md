@@ -12,3 +12,6 @@ This package assumes data in this form:
 - North Latitude is positive, East Longitude is positive.
 
 This package has been tested on confidential data; therefore, data and Jupyter Notebooks that contain trials and errors will not be shared.
+
+Here is the package diagram:
+![GeoSampling](https://user-images.githubusercontent.com/40537954/167361862-a8247a32-f388-47a8-9097-73a97bcaf826.jpg)
